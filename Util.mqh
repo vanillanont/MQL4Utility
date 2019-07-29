@@ -43,6 +43,9 @@ struct Order {
    double price;
    double lots;
 }; 
+ 
+
+
 
 enum ORDER_FIND_TYPE{
    FIND_ALL = 0,
@@ -476,7 +479,37 @@ void AddOrder(Order &arr_Ords[]){
    arr_Ords[ArraySize(arr_Ords)-1] = ord;
 }
 
-
+void Orders(Order &arr_Ords[],ORDER_FIND_TYPE find_by = 0,string _value = "")
+{ 
+   ArrayFree(arr_Ords);
+   for (int i = 0; i < OrdersTotal(); i++)
+   { 
+       if (OrderSelect(i, SELECT_BY_POS) == true)
+       {    
+          if(find_by == FIND_ALL){
+               AddOrder(arr_Ords);
+          } 
+          
+          if(find_by == FIND_BY_COMMENT){
+            if(OrderComment() == _value){   
+               AddOrder(arr_Ords);
+            }
+          } 
+          
+          if(find_by == FIND_BY_MAGIC){
+            if(IntegerToString(OrderMagicNumber()) == _value){  
+               AddOrder(arr_Ords);
+            }
+          } 
+          
+          if(find_by == FIND_BY_SYMBOL){
+            if(OrderSymbol() == _value){    
+               AddOrder(arr_Ords);
+            }
+          }  
+       }
+   }    
+}
 
 void RebindOrders(Order &arr_Ords[],ORDER_FIND_TYPE find_by = 0,string _value = "")
 { 
@@ -529,4 +562,154 @@ double OrdersLots(Order &arr_Ords[]){
    }
    //Print("total_profit = "+total_profit);
    return total_lots;
+}
+
+string previous_sl = "";
+string previous_tp = "";
+string previous_ticket = "";
+string previous_open_price = ""; 
+  
+string JSONOrders(string &status)
+{    
+   string open_price = ""; 
+   string sl = "";
+   string tp = "";
+   string ticket = "";
+   string json = "";
+   
+   json += "{\"Orders\":[";
+   for (int i = OrdersTotal(); i >= 0; i--)
+   { 
+       if (OrderSelect(i, SELECT_BY_POS) == true)
+       {      
+           ticket += ","+OrderTicket();
+           sl += ","+OrderStopLoss();
+           tp += ","+OrderTakeProfit();
+           open_price += ","+OrderOpenPrice(); 
+           json += "{";
+           json += "\"OrderTicket\":\""+OrderTicket()+"\",";
+           json += "\"OrderType\":\""+OrderType()+"\",";
+           json += "\"OrderTakeProfit\":\""+OrderTakeProfit()+"\",";
+           json += "\"OrderSymbol\":\""+OrderSymbol()+"\",";
+           json += "\"OrderSwap\":\""+OrderSwap()+"\",";
+           json += "\"OrderStopLoss\":\""+OrderStopLoss()+"\",";
+           json += "\"OrderProfit\":\""+OrderProfit()+"\",";
+           json += "\"OrderOpenTime\":\""+OrderOpenTime()+"\",";
+           json += "\"OrderOpenPrice\":\""+OrderOpenPrice()+"\",";
+           json += "\"OrderMagicNumber\":\""+OrderMagicNumber()+"\",";
+           json += "\"OrderLots\":\""+OrderLots()+"\",";
+           json += "\"OrderExpiration\":\""+OrderExpiration()+"\",";
+           json += "\"OrderCommission\":\""+OrderCommission()+"\",";
+           json += "\"OrderComment\":\""+OrderComment()+"\",";
+           json += "\"OrderCloseTime\":\""+OrderCloseTime()+"\",";
+           json += "\"OrderClosePrice\":\""+OrderClosePrice()+"\"";
+           json += "},";  
+       }
+   }     
+   json = StringSubstr(json,0,StringLen(json)-1); 
+   json += "]}";
+   
+   
+   if((ticket == previous_ticket) 
+      && (sl == previous_sl) 
+      && (tp == previous_tp)
+      && (open_price == previous_open_price) 
+      ){
+      status = "SAME";
+   }else{
+      status = "DIFF";
+      previous_ticket = ticket;
+      previous_sl = sl;
+      previous_tp = tp;   
+      previous_open_price = open_price;  
+   } 
+   return json;
+}
+
+
+
+string JSONLatestOrder()
+{     
+   string json = "";
+   json += "{\"Orders\":[";
+   for (int i = OrdersTotal(); i >= 0; i--)
+   { 
+       if (OrderSelect(i, SELECT_BY_POS) == true)
+       {       
+           if(OrderType() == OP_BUY || OrderType() == OP_SELL){
+              json += "{";
+              json += "\"OrderTicket\":\""+OrderTicket()+"\",";
+              json += "\"OrderType\":\""+OrderType()+"\",";
+              json += "\"OrderTakeProfit\":\""+OrderTakeProfit()+"\",";
+              json += "\"OrderSymbol\":\""+OrderSymbol()+"\",";
+              json += "\"OrderSwap\":\""+OrderSwap()+"\",";
+              json += "\"OrderStopLoss\":\""+OrderStopLoss()+"\",";
+              json += "\"OrderProfit\":\""+OrderProfit()+"\",";
+              json += "\"OrderOpenTime\":\""+OrderOpenTime()+"\",";
+              json += "\"OrderOpenPrice\":\""+OrderOpenPrice()+"\",";
+              json += "\"OrderMagicNumber\":\""+OrderMagicNumber()+"\",";
+              json += "\"OrderLots\":\""+OrderLots()+"\",";
+              json += "\"OrderExpiration\":\""+OrderExpiration()+"\",";
+              json += "\"OrderCommission\":\""+OrderCommission()+"\",";
+              json += "\"OrderComment\":\""+OrderComment()+"\",";
+              json += "\"OrderCloseTime\":\""+OrderCloseTime()+"\",";
+              json += "\"OrderClosePrice\":\""+OrderClosePrice()+"\"";
+              json += "},";  
+              break;
+           }
+       }
+   }     
+   json = StringSubstr(json,0,StringLen(json)-1); 
+   json += "]}";
+    
+   return json;
+}
+
+ 
+ 
+ 
+
+string JSONLatestHistory(int topNumber)
+{      
+   int order_history_total = OrdersHistoryTotal();
+   int order_history_reach =  order_history_total - topNumber;
+   if(order_history_reach < 0) order_history_reach = 0;
+     
+   string json = "";
+   json += "{\"Orders\":[";
+   
+   for(int i=OrdersHistoryTotal()-1;i>=order_history_reach;i--)
+    {
+      if(OrderSelect(i, SELECT_BY_POS,MODE_HISTORY)){
+           json += "{";
+           json += "\"OrderTicket\":\""+OrderTicket()+"\",";
+           json += "\"OrderType\":\""+OrderType()+"\",";
+           json += "\"OrderTakeProfit\":\""+OrderTakeProfit()+"\",";
+           json += "\"OrderSymbol\":\""+OrderSymbol()+"\",";
+           json += "\"OrderSwap\":\""+OrderSwap()+"\",";
+           json += "\"OrderStopLoss\":\""+OrderStopLoss()+"\",";
+           json += "\"OrderProfit\":\""+OrderProfit()+"\",";
+           json += "\"OrderOpenTime\":\""+OrderOpenTime()+"\",";
+           json += "\"OrderOpenPrice\":\""+OrderOpenPrice()+"\",";
+           json += "\"OrderMagicNumber\":\""+OrderMagicNumber()+"\",";
+           json += "\"OrderLots\":\""+OrderLots()+"\",";
+           json += "\"OrderExpiration\":\""+OrderExpiration()+"\",";
+           json += "\"OrderCommission\":\""+OrderCommission()+"\",";
+           json += "\"OrderComment\":\""+OrderComment()+"\",";
+           json += "\"OrderCloseTime\":\""+OrderCloseTime()+"\",";
+           json += "\"OrderClosePrice\":\""+OrderClosePrice()+"\"";
+           json += "},"; 
+      }
+    } 
+   json = StringSubstr(json,0,StringLen(json)-1); 
+   json += "]}"; 
+   return json;
+}
+
+
+
+string JSONAccount()
+{     
+   string json = "{\"AccountBalance\":\""+AccountBalance()+"\",\"AccountEquity\":\""+AccountEquity()+"\",\"AccountLeverage\":\""+AccountLeverage()+"\",\"AccountCurrency\":\""+AccountCurrency()+"\"}"; 
+   return json;
 }
