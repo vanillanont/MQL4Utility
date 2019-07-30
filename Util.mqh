@@ -6,6 +6,8 @@
 #property copyright "Copyright 2019, MetaQuotes Software Corp."
 #property link      "https://www.mql5.com"
 #property strict
+#include <MQL4Utility/hash.mqh>
+#include <MQL4Utility/json.mqh>
 //+------------------------------------------------------------------+
 //| defines                                                          |
 //+------------------------------------------------------------------+
@@ -712,4 +714,15 @@ string JSONAccount()
 {     
    string json = "{\"AccountBalance\":\""+AccountBalance()+"\",\"AccountEquity\":\""+AccountEquity()+"\",\"AccountLeverage\":\""+AccountLeverage()+"\",\"AccountCurrency\":\""+AccountCurrency()+"\"}"; 
    return json;
+}
+
+
+string HTTPGet(string url){
+   string return_result = "";
+   string cookie=NULL,headers;
+   int timeout=5000;
+   char data[],result[];
+   WebRequest("GET",url,cookie,NULL,timeout,data,0,result,headers);
+   return_result = CharArrayToString(result);
+   return return_result;
 }
