@@ -679,28 +679,35 @@ string JSONLatestHistory(int topNumber)
      
    string json = "";
    json += "{\"Orders\":[";
-   
-   for(int i=OrdersHistoryTotal()-1;i>=order_history_reach;i--)
+   int totalCount = 0;
+   for(int i=OrdersHistoryTotal()-1;i>=0;i--)
     {
       if(OrderSelect(i, SELECT_BY_POS,MODE_HISTORY)){
-           json += "{";
-           json += "\"OrderTicket\":\""+OrderTicket()+"\",";
-           json += "\"OrderType\":\""+OrderType()+"\",";
-           json += "\"OrderTakeProfit\":\""+OrderTakeProfit()+"\",";
-           json += "\"OrderSymbol\":\""+OrderSymbol()+"\",";
-           json += "\"OrderSwap\":\""+OrderSwap()+"\",";
-           json += "\"OrderStopLoss\":\""+OrderStopLoss()+"\",";
-           json += "\"OrderProfit\":\""+OrderProfit()+"\",";
-           json += "\"OrderOpenTime\":\""+OrderOpenTime()+"\",";
-           json += "\"OrderOpenPrice\":\""+OrderOpenPrice()+"\",";
-           json += "\"OrderMagicNumber\":\""+OrderMagicNumber()+"\",";
-           json += "\"OrderLots\":\""+OrderLots()+"\",";
-           json += "\"OrderExpiration\":\""+OrderExpiration()+"\",";
-           json += "\"OrderCommission\":\""+OrderCommission()+"\",";
-           json += "\"OrderComment\":\""+OrderComment()+"\",";
-           json += "\"OrderCloseTime\":\""+OrderCloseTime()+"\",";
-           json += "\"OrderClosePrice\":\""+OrderClosePrice()+"\"";
-           json += "},"; 
+           if(OrderType() == OP_SELL || OrderType() == OP_BUY){ 
+              json += "{";
+              json += "\"OrderTicket\":\""+OrderTicket()+"\",";
+              json += "\"OrderType\":\""+OrderType()+"\",";
+              json += "\"OrderTakeProfit\":\""+OrderTakeProfit()+"\",";
+              json += "\"OrderSymbol\":\""+OrderSymbol()+"\",";
+              json += "\"OrderSwap\":\""+OrderSwap()+"\",";
+              json += "\"OrderStopLoss\":\""+OrderStopLoss()+"\",";
+              json += "\"OrderProfit\":\""+OrderProfit()+"\",";
+              json += "\"OrderOpenTime\":\""+OrderOpenTime()+"\",";
+              json += "\"OrderOpenPrice\":\""+OrderOpenPrice()+"\",";
+              json += "\"OrderMagicNumber\":\""+OrderMagicNumber()+"\",";
+              json += "\"OrderLots\":\""+OrderLots()+"\",";
+              json += "\"OrderExpiration\":\""+OrderExpiration()+"\",";
+              json += "\"OrderCommission\":\""+OrderCommission()+"\",";
+              json += "\"OrderComment\":\""+OrderComment()+"\",";
+              json += "\"OrderCloseTime\":\""+OrderCloseTime()+"\",";
+              json += "\"OrderClosePrice\":\""+OrderClosePrice()+"\"";
+              json += "},"; 
+              
+              totalCount++;
+           }
+      }
+      if(totalCount == topNumber){
+         break;
       }
     } 
    json = StringSubstr(json,0,StringLen(json)-1); 
