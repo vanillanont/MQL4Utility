@@ -481,6 +481,51 @@ void AddOrder(Order &arr_Ords[]){
    arr_Ords[ArraySize(arr_Ords)-1] = ord;
 }
 
+   void ArrayAdd(double & arr[],double value){ 
+      ArrayResize(arr,(ArraySize(arr)+1));
+      arr[(ArraySize(arr)-1)] = value; 
+   } 
+   
+     void ArrayAdd(string & arr[],string value){ 
+      ArrayResize(arr,(ArraySize(arr)+1));
+      arr[(ArraySize(arr)-1)] = value; 
+   } 
+     void ArrayAdd(int & arr[],int value){ 
+      ArrayResize(arr,(ArraySize(arr)+1));
+      arr[(ArraySize(arr)-1)] = value; 
+   } 
+   
+void ArrayRemoveByIndex(int &MyArray[],int index)
+{
+   int TempArray[];
+   
+   if(index != 0){ 
+      //Lets copy index 0-4 as the input index is to remove index 5
+      ArrayCopy(TempArray,MyArray,0,0,index);
+   }
+   
+   //Now Copy index 6-9, start from 6  as the input index is to remove index 5
+   ArrayCopy(TempArray,MyArray,index,(index+1));
+   
+   //copy Array back
+   ArrayFree(MyArray);
+   ArrayCopy(MyArray,TempArray,0,0);
+}
+
+void ArrayRemoveByIndex(string &MyArray[],int index)
+{
+   string TempArray[];
+   //Lets copy index 0-4 as the input index is to remove index 5
+   ArrayCopy(TempArray,MyArray,0,0,index);
+   //Now Copy index 6-9, start from 6  as the input index is to remove index 5
+   ArrayCopy(TempArray,MyArray,index,(index+1));
+   
+   //copy Array back
+   ArrayFree(MyArray);
+   ArrayCopy(MyArray,TempArray,0,0);
+}
+
+
 void Orders(Order &arr_Ords[],ORDER_FIND_TYPE find_by = 0,string _value = "")
 { 
    ArrayFree(arr_Ords);
