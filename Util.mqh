@@ -8,6 +8,12 @@
 #property strict
 #include <MQL4Utility/hash.mqh>
 #include <MQL4Utility/json.mqh>
+#import "MQL4Utility.dll" 
+string ReadAllText(string path); 
+string ExecuteReader(string Query,string Connection);
+string ExecuteScalar(string Query,string Connection);
+void   ExecuteCommand(string Query,string Connection);
+#import 
 //+------------------------------------------------------------------+
 //| defines                                                          |
 //+------------------------------------------------------------------+
@@ -629,13 +635,13 @@ string JSONOrders(string &status)
    { 
        if (OrderSelect(i, SELECT_BY_POS) == true)
        {      
-           ticket += ","+OrderTicket();
+           ticket += ","+IntegerToString(OrderTicket());
            sl += ","+OrderStopLoss();
            tp += ","+OrderTakeProfit();
            open_price += ","+OrderOpenPrice(); 
            json += "{";
-           json += "\"OrderTicket\":\""+OrderTicket()+"\",";
-           json += "\"OrderType\":\""+OrderType()+"\",";
+           json += "\"OrderTicket\":\""+IntegerToString(OrderTicket())+"\",";
+           json += "\"OrderType\":\""+IntegerToString(OrderType())+"\",";
            json += "\"OrderTakeProfit\":\""+OrderTakeProfit()+"\",";
            json += "\"OrderSymbol\":\""+OrderSymbol()+"\",";
            json += "\"OrderSwap\":\""+OrderSwap()+"\",";
