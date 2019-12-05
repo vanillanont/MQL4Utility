@@ -501,6 +501,12 @@ void AddOrder(Order &arr_Ords[]){
       arr[(ArraySize(arr)-1)] = value; 
    } 
    
+   
+     void ArrayAdd(long & arr[],long value){ 
+      ArrayResize(arr,(ArraySize(arr)+1));
+      arr[(ArraySize(arr)-1)] = value; 
+   } 
+   
 void ArrayRemoveByIndex(int &MyArray[],int index)
 {
    int TempArray[];
