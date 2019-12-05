@@ -8,7 +8,8 @@
 #property strict
 #include <MQL4Utility/hash.mqh>
 #include <MQL4Utility/json.mqh>
-#import "MQL4Utility.dll" 
+#import "MQL4Utility.dll"  
+void WriteAllText(string path,string text); 
 string ReadAllText(string path); 
 string ExecuteReader(string Query,string Connection);
 string ExecuteScalar(string Query,string Connection);
